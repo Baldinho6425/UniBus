@@ -82,7 +82,3 @@ escrito mas ainda não foi compilado/testado. Para continuar:
      escrever no Firestore em vez dos dados mock em `_seed()`.
 3. Ícone do app e nome de exibição por plataforma.
 4. Notificações push reais (Firebase Cloud Messaging) para os avisos.
-
-## Commits
-
-Os commits deste projeto são feitos manualmente pelo usuário.
