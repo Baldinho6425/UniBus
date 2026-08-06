@@ -6,7 +6,8 @@ import '../theme/app_theme.dart';
 const _destinations = [
   (icon: Icons.home_rounded, outlinedIcon: Icons.home_outlined, label: 'Início'),
   (icon: Icons.calendar_month_rounded, outlinedIcon: Icons.calendar_month_outlined, label: 'Viagens'),
-  (icon: Icons.groups_rounded, outlinedIcon: Icons.groups_outlined, label: 'Passageiros'),
+  (icon: Icons.volunteer_activism_rounded, outlinedIcon: Icons.volunteer_activism_outlined, label: 'Contrapartidas'),
+  (icon: Icons.notifications_rounded, outlinedIcon: Icons.notifications_none_rounded, label: 'Avisos'),
   (icon: Icons.person_rounded, outlinedIcon: Icons.person_outline, label: 'Perfil'),
 ];
 

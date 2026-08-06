@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/passenger.dart';
@@ -34,14 +35,14 @@ class _PassengersScreenState extends State<PassengersScreen> {
       return matchesQuery && matchesFilter;
     }).toList();
 
-    return SafeArea(
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        title: const Text('Passageiros'),
+      ),
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
-            child: Text('Passageiros', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
             child: TextField(

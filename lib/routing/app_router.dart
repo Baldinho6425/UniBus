@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/confirm_presence/confirm_presence_screen.dart';
+import '../screens/counterparts/counterparts_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/notices/notices_screen.dart';
 import '../screens/passengers/passengers_screen.dart';
@@ -42,8 +43,8 @@ GoRouter buildRouter(AuthProvider authProvider) {
                   builder: (context, state) => const ConfirmPresenceScreen(),
                 ),
                 GoRoute(
-                  path: 'avisos',
-                  builder: (context, state) => const NoticesScreen(),
+                  path: 'passageiros',
+                  builder: (context, state) => const PassengersScreen(),
                 ),
               ],
             ),
@@ -52,7 +53,10 @@ GoRouter buildRouter(AuthProvider authProvider) {
             GoRoute(path: '/viagens', builder: (context, state) => const TripsScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/passageiros', builder: (context, state) => const PassengersScreen()),
+            GoRoute(path: '/contrapartidas', builder: (context, state) => const CounterpartsScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/avisos', builder: (context, state) => const NoticesScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
@@ -60,6 +64,14 @@ GoRouter buildRouter(AuthProvider authProvider) {
               builder: (context, state) => const ProfileScreen(),
               routes: [
                 GoRoute(path: 'editar', builder: (context, state) => const EditProfileScreen()),
+                GoRoute(
+                  path: 'documentos',
+                  builder: (context, state) => const SimpleInfoScreen(
+                    title: 'Documentos',
+                    message: 'Em breve você poderá enviar e gerenciar seus documentos diretamente por aqui.',
+                    icon: Icons.description_outlined,
+                  ),
+                ),
                 GoRoute(
                   path: 'senha',
                   builder: (context, state) => const SimpleInfoScreen(

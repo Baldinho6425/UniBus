@@ -107,19 +107,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                        SizedBox(
+                          width: 34,
+                          height: 34,
+                          child: Checkbox(
+                            value: _rememberMe,
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                          ),
                         ),
-                        const Text('Lembrar de mim'),
+                        const SizedBox(width: 4),
+                        const Text('Lembrar de mim', style: TextStyle(fontSize: 13)),
                         const Spacer(),
-                        TextButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Envie um e-mail para suporte@unibus.app para redefinir sua senha.')),
-                            );
-                          },
-                          child: const Text('Esqueci minha senha'),
+                        Flexible(
+                          child: TextButton(
+                            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4)),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Envie um e-mail para suporte@unibus.app para redefinir sua senha.')),
+                              );
+                            },
+                            child: const Text('Esqueci minha senha', style: TextStyle(fontSize: 12.5), overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                       ],
                     ),

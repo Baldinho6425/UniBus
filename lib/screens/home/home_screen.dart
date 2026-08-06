@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/notice.dart';
 import '../../models/trip.dart';
 import '../../state/app_data_provider.dart';
 import '../../state/auth_provider.dart';
@@ -18,7 +19,7 @@ class HomeScreen extends StatelessWidget {
     final data = context.watch<AppDataProvider>();
     final nextTrip = data.nextTrip;
     final firstName = (user?.name ?? '').split(' ').first;
-    final upcomingPreview = data.upcomingTrips.skip(1).take(3).toList();
+    final unreadNotices = data.notices.where((n) => !n.isRead).take(2).toList();
 
     return SafeArea(
       child: ListView(
@@ -40,30 +41,36 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () => context.go('/avisos'),
-                icon: const Icon(Icons.notifications_none_rounded, size: 28),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    onPressed: () => context.go('/avisos'),
+                    icon: const Icon(Icons.notifications_none_rounded, size: 28),
+                  ),
+                  if (data.unreadNoticesCount > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(color: AppColors.danger, shape: BoxShape.circle),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
           const SizedBox(height: 20),
           if (nextTrip != null) _NextTripCard(trip: nextTrip),
           const SizedBox(height: 20),
-          _QuickActions(),
+          const _QuickActions(),
           const SizedBox(height: 24),
-          if (upcomingPreview.isNotEmpty) ...[
-            const Text('Próximas viagens', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Card(
-              child: Column(
-                children: [
-                  for (var i = 0; i < upcomingPreview.length; i++) ...[
-                    _UpcomingTripRow(trip: upcomingPreview[i]),
-                    if (i != upcomingPreview.length - 1) const Divider(height: 1, indent: 16, endIndent: 16),
-                  ],
-                ],
-              ),
-            ),
+          const _CounterpartsSummaryCard(),
+          if (unreadNotices.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            _UnreadNoticesSection(notices: unreadNotices, unreadCount: data.unreadNoticesCount),
           ],
         ],
       ),
@@ -89,7 +96,7 @@ class _NextTripCard extends StatelessWidget {
               children: [
                 const Icon(Icons.directions_bus_rounded, size: 18, color: AppColors.textSecondary),
                 const SizedBox(width: 6),
-                Text('Próxima viagem', style: const TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                const Text('Próxima viagem', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
                 const Spacer(),
                 StatusBadge(
                   label: confirmed ? 'Confirmado' : 'Pendente',
@@ -174,37 +181,209 @@ class _QuickActions extends StatelessWidget {
   }
 }
 
-class _UpcomingTripRow extends StatelessWidget {
-  const _UpcomingTripRow({required this.trip});
-
-  final Trip trip;
+class _CounterpartsSummaryCard extends StatelessWidget {
+  const _CounterpartsSummaryCard();
 
   @override
   Widget build(BuildContext context) {
-    final confirmed = trip.status == TripStatus.confirmed;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    final data = context.watch<AppDataProvider>();
+    final required = data.counterpartRequiredHours;
+    final completed = data.counterpartCompletedHours;
+    final pending = data.counterpartPendingHours;
+    final next = data.nextCounterpartActivity;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text('${AppDateFormat.weekdayAbbrevCapitalized(trip.date)}, ${AppDateFormat.dayMonth(trip.date)}',
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text(trip.departureTime, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+                const Text('Contrapartidas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Spacer(),
+                TextButton(
+                  onPressed: () => context.go('/contrapartidas'),
+                  style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 32)),
+                  child: const Text('Ver mais'),
+                ),
               ],
             ),
-          ),
-          if (confirmed)
-            const StatusBadge(label: 'Confirmado', color: AppColors.success, background: AppColors.successBg)
-          else
-            OutlinedButton(
-              onPressed: () => context.read<AppDataProvider>().confirmPresence(trip.id),
-              style: OutlinedButton.styleFrom(minimumSize: const Size(0, 36), padding: const EdgeInsets.symmetric(horizontal: 16)),
-              child: const Text('Confirmar'),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _HoursProgress(
+                    label: 'Horas concluídas',
+                    value: completed,
+                    total: required,
+                    color: AppColors.success,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _HoursProgress(
+                    label: 'Horas pendentes',
+                    value: pending,
+                    total: required,
+                    color: AppColors.warning,
+                  ),
+                ),
+              ],
             ),
-        ],
+            if (next != null) ...[
+              const SizedBox(height: 18),
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => context.go('/contrapartidas'),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                        child: const Icon(Icons.volunteer_activism_outlined, color: AppColors.primary, size: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Próxima atividade', style: TextStyle(color: AppColors.textSecondary, fontSize: 11.5)),
+                            Text(
+                              '${next.title} • ${AppDateFormat.dayMonth(next.date)} • ${next.hours} horas',
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HoursProgress extends StatelessWidget {
+  const _HoursProgress({required this.label, required this.value, required this.total, required this.color});
+
+  final String label;
+  final int value;
+  final int total;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final fraction = total <= 0 ? 0.0 : (value / total).clamp(0.0, 1.0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5)),
+        const SizedBox(height: 4),
+        Text('${value}h', style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 20)),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: fraction,
+            minHeight: 6,
+            backgroundColor: const Color(0xFFEDEEF2),
+            valueColor: AlwaysStoppedAnimation(color),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _UnreadNoticesSection extends StatelessWidget {
+  const _UnreadNoticesSection({required this.notices, required this.unreadCount});
+
+  final List<Notice> notices;
+  final int unreadCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text('Avisos não lidos', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            const SizedBox(width: 8),
+            StatusBadge(label: '$unreadCount', color: AppColors.danger, background: AppColors.dangerBg),
+            const Spacer(),
+            TextButton(
+              onPressed: () => context.go('/avisos'),
+              style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 32)),
+              child: const Text('Ver mais'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Card(
+          child: Column(
+            children: [
+              for (var i = 0; i < notices.length; i++) ...[
+                _UnreadNoticeRow(notice: notices[i]),
+                if (i != notices.length - 1) const Divider(height: 1, indent: 16, endIndent: 16),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _UnreadNoticeRow extends StatelessWidget {
+  const _UnreadNoticeRow({required this.notice});
+
+  final Notice notice;
+
+  String get _categoryLabel {
+    switch (notice.category) {
+      case NoticeCategory.transporte:
+        return 'Transporte';
+      case NoticeCategory.contrapartidas:
+        return 'Contrapartidas';
+      case NoticeCategory.eventos:
+        return 'Eventos';
+      case NoticeCategory.urgente:
+        return 'Urgente';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => context.go('/avisos'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StatusBadge(label: _categoryLabel, color: AppColors.primary, background: AppColors.primary.withValues(alpha: 0.1)),
+                  const SizedBox(height: 6),
+                  Text(notice.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)),
+          ],
+        ),
       ),
     );
   }

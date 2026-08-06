@@ -66,10 +66,37 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
+          if (user != null) ...[
+            const SizedBox(height: 20),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 12, bottom: 4),
+                      child: Text('Informações pessoais', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    ),
+                    _InfoRow(label: 'Curso', value: user.course),
+                    _InfoRow(label: 'Semestre', value: user.semester),
+                    _InfoRow(label: 'Município', value: user.municipality),
+                    _InfoRow(label: 'Ponto de embarque', value: user.boardingPoint, isLast: true),
+                  ],
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
           Card(
             child: Column(
               children: [
+                _ProfileTile(
+                  icon: Icons.description_outlined,
+                  label: 'Documentos',
+                  onTap: () => context.push('/perfil/documentos'),
+                ),
+                const Divider(height: 1, indent: 56),
                 _ProfileTile(
                   icon: Icons.edit_outlined,
                   label: 'Editar perfil',
@@ -113,6 +140,34 @@ class ProfileScreen extends StatelessWidget {
               side: const BorderSide(color: AppColors.danger),
             ),
             child: const Text('Sair da conta'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.label, required this.value, this.isLast = false});
+
+  final String label;
+  final String value;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 14 : 12),
+      child: Row(
+        children: [
+          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13.5)),
+          const Spacer(),
+          Flexible(
+            child: Text(
+              value.isEmpty ? '—' : value,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),

@@ -3,6 +3,10 @@ class AppUser {
   final String name;
   final String email;
   final String phone;
+  final String course;
+  final String semester;
+  final String municipality;
+  final String boardingPoint;
   final bool notificationsEnabled;
 
   const AppUser({
@@ -10,6 +14,10 @@ class AppUser {
     required this.name,
     required this.email,
     required this.phone,
+    this.course = '',
+    this.semester = '',
+    this.municipality = '',
+    this.boardingPoint = '',
     this.notificationsEnabled = true,
   });
 
@@ -24,6 +32,10 @@ class AppUser {
     String? name,
     String? email,
     String? phone,
+    String? course,
+    String? semester,
+    String? municipality,
+    String? boardingPoint,
     bool? notificationsEnabled,
   }) {
     return AppUser(
@@ -31,6 +43,10 @@ class AppUser {
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      course: course ?? this.course,
+      semester: semester ?? this.semester,
+      municipality: municipality ?? this.municipality,
+      boardingPoint: boardingPoint ?? this.boardingPoint,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     );
   }

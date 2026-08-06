@@ -32,6 +32,10 @@ class AuthProvider extends ChangeNotifier {
       name: 'Eduardo A. Giehl',
       email: 'eduardo@email.com',
       phone: '(49) 99999-9999',
+      course: 'Ciência da Computação',
+      semester: '5º Semestre',
+      municipality: 'São Miguel do Oeste',
+      boardingPoint: 'Em frente ao Mercado Central',
     );
     _errorMessage = null;
     _setLoading(false);
