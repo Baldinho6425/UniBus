@@ -12,12 +12,29 @@ avisos e contrapartidas (horas de trabalho comunitário).
   push. *Ainda não configurado neste projeto* (ver seção "Próximos passos").
 - **provider** para gerenciamento de estado e **go_router** para navegação
   (bottom navigation no mobile, navigation rail no desktop, mesmo código).
+- **fl_chart** para os gráficos do Painel Administrativo (donuts e linha).
+
+## Contas de teste
+
+O login é mock (sem backend ainda) e identifica o papel pelo e-mail:
+
+| Papel  | E-mail            | Senha    | Vai para |
+|--------|-------------------|----------|----------|
+| Aluno  | qualquer e-mail/telefone não vazio | qualquer senha não vazia | Painel do Usuário (`/`) |
+| Admin  | `adm@email.com`   | `adm123` | Painel Administrativo (`/admin`) |
+
+A verificação do e-mail do admin não diferencia maiúsculas/minúsculas. Qualquer
+outra combinação de e-mail/senha (não vazios) loga como aluno.
 
 ## Status atual
 
 Todas as telas do mockup do Painel do Usuário (`Planejamento/Imgs/PainelUsuario.png`)
-foram implementadas com **dados de exemplo em memória** (sem backend ainda),
-navegação completa em 5 abas — Início, Viagens, Contrapartidas, Avisos, Perfil:
+e o Dashboard do Painel Administrativo (`Planejamento/Imgs/PainelAdm.png`) foram
+implementados com **dados de exemplo em memória** (sem backend ainda).
+
+### Painel do Usuário (aluno)
+
+Navegação em 5 abas — Início, Viagens, Contrapartidas, Avisos, Perfil:
 
 - Login / Cadastro
 - Início (próxima viagem, ações rápidas, resumo de contrapartidas, avisos não lidos)
@@ -30,8 +47,20 @@ navegação completa em 5 abas — Início, Viagens, Contrapartidas, Avisos, Per
 - Perfil (informações pessoais, documentos, editar perfil, notificações,
   alterar senha, ajuda, sobre, sair)
 
-Painel Administrativo (web) ainda não implementado — mockup de referência em
-`Planejamento/Imgs/PainelAdm.png`.
+### Painel Administrativo (admin)
+
+Sidebar fixa no desktop / drawer no mobile, com login separado do aluno
+(ver "Contas de teste" acima):
+
+- **Dashboard** — totalmente funcional com dados mock: cards de estatística
+  (alunos, viagens, ônibus, contrapartidas, pendências), gráficos de
+  Presenças/Ocupação/Horas de contrapartida, ações rápidas, tabela de
+  próximas viagens, contrapartidas recentes, avisos não lidos, ocupação dos
+  ônibus e alunos por situação.
+- Demais seções do menu (Alunos, Viagens, Contrapartidas, Passageiros,
+  Ônibus, Motoristas, Avisos, Notificações, Relatórios, Exportações,
+  Configurações, Parâmetros do sistema, Usuários) têm rota e tela
+  "em construção" — ainda sem CRUD real.
 
 Estrutura do código:
 
@@ -40,11 +69,14 @@ lib/
   main.dart              # entry point
   app.dart                # MaterialApp.router + providers
   theme/                  # cores e tema (Material 3)
-  models/                 # AppUser, Trip, Passenger, Notice, CounterpartActivity
-  state/                  # AuthProvider e AppDataProvider (mock em memória)
-  routing/                # GoRouter (rotas + shell de navegação)
-  widgets/                # MainScaffold (bottom nav / nav rail), StatusBadge
-  screens/                # uma pasta por tela (inclui counterparts/)
+  models/                 # AppUser, Trip, Passenger, Notice, CounterpartActivity,
+                           # admin_models (AdminTripRow, BusOccupancy, ...)
+  state/                  # AuthProvider, AppDataProvider e AdminDataProvider
+                           # (mock em memória)
+  routing/                # GoRouter (rotas + shell de navegação + redirect por papel)
+  widgets/                # MainScaffold (bottom nav / nav rail), AdminScaffold
+                           # (sidebar / drawer), StatusBadge
+  screens/                # uma pasta por tela (inclui counterparts/ e admin/)
   utils/                  # formatação de datas em pt-BR
 ```
 
@@ -89,5 +121,6 @@ flutter run               # escolhe device Android conectado via USB / Chrome
      para ler e escrever no Firestore em vez dos dados mock em `_seed()`.
 2. Ícone do app e nome de exibição por plataforma.
 3. Notificações push reais (Firebase Cloud Messaging) para os avisos.
-4. Painel Administrativo (web), conforme `Planejamento/Imgs/PainelAdm.png` e
+4. CRUD real nas seções do Painel Administrativo hoje "em construção"
+   (Alunos, Viagens, Ônibus, Motoristas, Relatórios etc.), conforme
    `Planejamento/UniBus_Planejamento.md`.

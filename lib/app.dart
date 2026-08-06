@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'routing/app_router.dart';
+import 'state/admin_data_provider.dart';
 import 'state/app_data_provider.dart';
 import 'state/auth_provider.dart';
 import 'theme/app_theme.dart';
@@ -16,6 +17,7 @@ class UniBusApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AppDataProvider()),
+        ChangeNotifierProvider(create: (_) => AdminDataProvider()),
       ],
       child: const _AppView(),
     );

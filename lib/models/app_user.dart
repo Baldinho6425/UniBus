@@ -8,6 +8,7 @@ class AppUser {
   final String municipality;
   final String boardingPoint;
   final bool notificationsEnabled;
+  final bool isAdmin;
 
   const AppUser({
     required this.id,
@@ -19,6 +20,7 @@ class AppUser {
     this.municipality = '',
     this.boardingPoint = '',
     this.notificationsEnabled = true,
+    this.isAdmin = false,
   });
 
   String get initials {
@@ -48,6 +50,7 @@ class AppUser {
       municipality: municipality ?? this.municipality,
       boardingPoint: boardingPoint ?? this.boardingPoint,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      isAdmin: isAdmin,
     );
   }
 }

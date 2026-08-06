@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 
 import '../models/app_user.dart';
 
+const _adminEmail = 'adm@email.com';
+const _adminPassword = 'adm123';
+
 /// Gerencia sessão do usuário.
 ///
 /// Hoje funciona com um usuário mock em memória. Quando o Firebase for
@@ -25,6 +28,19 @@ class AuthProvider extends ChangeNotifier {
       _errorMessage = 'Preencha e-mail/telefone e senha.';
       _setLoading(false);
       return false;
+    }
+
+    if (emailOrPhone.trim().toLowerCase() == _adminEmail && password == _adminPassword) {
+      _currentUser = const AppUser(
+        id: 'admin',
+        name: 'Administrador',
+        email: 'adm@email.com',
+        phone: '',
+        isAdmin: true,
+      );
+      _errorMessage = null;
+      _setLoading(false);
+      return true;
     }
 
     _currentUser = const AppUser(

@@ -14,6 +14,8 @@ class AppColors {
   static const Color surface = Color(0xFFF5F7FB);
   static const Color textPrimary = Color(0xFF1A1D29);
   static const Color textSecondary = Color(0xFF6B7280);
+  static const Color accentPurple = Color(0xFF8B5CF6);
+  static const Color accentPurpleBg = Color(0xFFF1EBFE);
 }
 
 class AppTheme {
